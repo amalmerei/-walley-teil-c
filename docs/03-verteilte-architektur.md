@@ -191,7 +191,7 @@ Um zu zeigen, dass Frontend, Backend, Stats-Service und Notification-Service
 nicht nur einzeln laufen, sondern auch live zusammenarbeiten, wurde eine
 überfällige Aufgabe in der App abgehakt.
 
-**Vorher:** Aufgabe "Play fetch in the backyard" ist noch nicht erledigt.
+**Vorher:** Aufgabe "Evening medication" ist noch nicht erledigt.
 
 ![Vor dem Abhaken](Screenshots/persistenz-vorher.png)
 
