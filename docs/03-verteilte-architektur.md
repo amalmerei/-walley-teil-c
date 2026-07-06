@@ -70,7 +70,7 @@ Nachweis: Abfrage aller Aufgaben direkt über die Kommandozeile
 (`curl http://localhost:3000/tasks`), die zeigt, dass der Server läuft und
 echte Daten aus der Datenbank liefert.
 
-![Backend Terminal](bilder/backend-terminal.png)
+![Backend Terminal](Screenshots/backend-terminal.png)
 
 ---
 
@@ -87,11 +87,11 @@ Backend, Stats-Service und Notification-Service schickt.
 
 **Start:** `node frontend-server.js`
 
-![Frontend-Server Terminal](bilder/frontend-server-terminal.png)
+![Frontend-Server Terminal](Screenshots/frontend-server-terminal.png)
 
 Die App selbst im Browser, erreichbar unter `http://localhost:5050`:
 
-![App im Browser](bilder/app-im-browser.png)
+![App im Browser](Screenshots/app-im-browser.png)
 
 ---
 
@@ -108,7 +108,7 @@ sondern bezieht sie von einem dritten, unabhängigen Dienst.
 
 Nachweis über `curl http://localhost:4000/stats`:
 
-![Stats-Service Terminal](bilder/stats-service-terminal.png)
+![Stats-Service Terminal](Screenshots/stats-service-terminal.png)
 
 ---
 
@@ -122,7 +122,7 @@ Das Ergebnis wird im Frontend als rote Warnung angezeigt.
 
 Nachweis über `curl http://localhost:4100/overdue`:
 
-![Notification-Service Terminal](bilder/notification-service-terminal.png)
+![Notification-Service Terminal](Screenshots/notification-service-terminal.png)
 
 ---
 
@@ -137,7 +137,7 @@ Praxis üblichen Monitoring/Health-Checking verteilter Systeme.
 Nachweis über `curl http://localhost:4200/health` – zeigt, dass alle drei
 überwachten Services gleichzeitig online sind:
 
-![Health-Service Terminal](bilder/health-service-terminal.png)
+![Health-Service Terminal](Screenshots/health-service-terminal.png)
 
 ---
 
