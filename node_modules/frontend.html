@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Walley's Tasks</title>
+  <style>
+    body {
+      font-family: -apple-system, Arial, sans-serif;
+      background: #f7f7f8;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 8px;
+    }
+    .header img {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #e0e0e0;
+    }
+    h1 {
+      font-size: 22px;
+      margin: 0;
+    }
+    .counter {
+      color: #666;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    .overdue-warning {
+      background: #fee2e2;
+      color: #b91c1c;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .overdue-warning.visible {
+      display: block;
+    }
+    .task {
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .task.done .title {
+      text-decoration: line-through;
+      color: #999;
+    }
+    .task .content {
+      flex: 1;
+    }
+    .task .title {
+      font-size: 15px;
+      display: block;
+    }
+    .task .meta {
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #777;
+      flex-wrap: wrap;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-walk { background: #d1fae5; color: #047857; }
+    .badge-feeding { background: #fef3c7; color: #92400e; }
+    .badge-grooming { background: #ede9fe; color: #6d28d9; }
+    .badge-play { background: #dbeafe; color: #1d4ed8; }
+    .badge-health { background: #fee2e2; color: #b91c1c; }
+    .badge-low { background: #f3f4f6; color: #4b5563; }
+    .badge-medium { background: #fef9c3; color: #92400e; }
+    .badge-high { background: #fee2e2; color: #b91c1c; }
+    .task button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      color: #c0392b;
+      margin-top: 2px;
+    }
+    .add-form {
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .add-form input, .add-form select {
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    .add-form-row {
+      display: flex;
+      gap: 8px;
+    }
+    .add-form-row > * {
+      flex: 1;
+    }
+    .add-form button {
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: none;
+      background: #2563eb;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .error {
+      color: #c0392b;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <img src="walley.png" alt="Walley" />
+      <h1>🐾 Walley's Tasks</h1>
+    </div>
+    <p class="counter" id="counter">Lädt...</p>
+    <div class="overdue-warning" id="overdueWarning"></div>
+
+    <div id="taskList"></div>
+
+    <div class="add-form">
+      <input type="text" id="newTitle" placeholder="Neue Aufgabe eingeben..." />
+      <div class="add-form-row">
+        <input type="time" id="newTime" />
+        <select id="newCategory">
+          <option value="walk">Walk</option>
+          <option value="feeding">Feeding</option>
+          <option value="grooming">Grooming</option>
+          <option value="play">Play</option>
+          <option value="health">Health</option>
+        </select>
+      </div>
+      <select id="newPriority">
+        <option value="low">Low</option>
+        <option value="medium" selected>Medium</option>
+        <option value="high">High</option>
+      </select>
+      <button onclick="addTask()">Hinzufügen</button>
+    </div>
+
+    <p class="error" id="errorMsg"></p>
+  </div>
+
+  <script>
+    // ─── Konfiguration: drei getrennte Services ─────
+    const BACKEND_URL = "http://localhost:3000";
+    const STATS_URL = "http://localhost:4000";
+    const NOTIFICATION_URL = "http://localhost:4100";
+
+    const CATEGORY_LABELS = {
+      walk: "Walk",
+      feeding: "Feeding",
+      grooming: "Grooming",
+      play: "Play",
+      health: "Health",
+    };
+
+    const PRIORITY_LABELS = {
+      low: "Low",
+      medium: "Medium",
+      high: "High",
+    };
+
+    // ─── Elemente aus der Seite holen ──────────────
+    const taskListEl = document.getElementById("taskList");
+    const counterEl = document.getElementById("counter");
+    const overdueEl = document.getElementById("overdueWarning");
+    const errorEl = document.getElementById("errorMsg");
+    const newTitleInput = document.getElementById("newTitle");
+    const newTimeInput = document.getElementById("newTime");
+    const newCategorySelect = document.getElementById("newCategory");
+    const newPrioritySelect = document.getElementById("newPriority");
+
+    function showError(message) {
+      errorEl.textContent = message;
+    }
+
+    function formatTime(time) {
+      if (!time) return "";
+      const [hourStr, minute] = time.split(":");
+      const hour = parseInt(hourStr, 10);
+      const ampm = hour >= 12 ? "PM" : "AM";
+      const displayHour = hour % 12 || 12;
+      return `${displayHour}:${minute} ${ampm}`;
+    }
+
+    // ─── Aufgaben vom Backend laden und anzeigen ────
+    async function loadTasks() {
+      try {
+        const response = await fetch(`${BACKEND_URL}/tasks`);
+        const tasks = await response.json();
+        renderTasks(tasks);
+      } catch (err) {
+        showError("Backend nicht erreichbar. Läuft node index.js?");
+      }
+    }
+
+    // ─── Fortschritt vom Stats-Service holen ────────
+    async function loadStats() {
+      try {
+        const response = await fetch(`${STATS_URL}/stats`);
+        const data = await response.json();
+        counterEl.textContent = data.text;
+      } catch (err) {
+        counterEl.textContent = "Stats-Service nicht erreichbar";
+      }
+    }
+
+    // ─── Überfällige Aufgaben vom Notification-Service holen ─
+    async function loadOverdue() {
+      try {
+        const response = await fetch(`${NOTIFICATION_URL}/overdue`);
+        const data = await response.json();
+        if (data.count > 0) {
+          overdueEl.textContent = `⚠️ ${data.count} Aufgabe(n) überfällig: ${data.tasks.join(", ")}`;
+          overdueEl.classList.add("visible");
+        } else {
+          overdueEl.classList.remove("visible");
+        }
+      } catch (err) {
+        overdueEl.textContent = "";
+        overdueEl.classList.remove("visible");
+      }
+    }
+
+    // ─── Alle drei Services beim Laden abfragen ─────
+    function refreshAll() {
+      loadTasks();
+      loadStats();
+      loadOverdue();
+    }
+
+    // ─── Aufgaben auf der Seite anzeigen ────────────
+    function renderTasks(tasks) {
+      taskListEl.innerHTML = "";
+
+      tasks.forEach((task) => {
+        const div = document.createElement("div");
+        div.className = "task" + (task.completed ? " done" : "");
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = task.completed;
+        checkbox.onchange = () => toggleTask(task.id);
+
+        const content = document.createElement("div");
+        content.className = "content";
+
+        const title = document.createElement("span");
+        title.className = "title";
+        title.textContent = task.title;
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+
+        const time = document.createElement("span");
+        time.textContent = "🕐 " + formatTime(task.dueTime);
+
+        const catBadge = document.createElement("span");
+        catBadge.className = "badge badge-" + task.category;
+        catBadge.textContent = CATEGORY_LABELS[task.category] || task.category;
+
+        const prioBadge = document.createElement("span");
+        prioBadge.className = "badge badge-" + task.priority;
+        prioBadge.textContent = PRIORITY_LABELS[task.priority] || task.priority;
+
+        meta.appendChild(time);
+        meta.appendChild(catBadge);
+        meta.appendChild(prioBadge);
+
+        content.appendChild(title);
+        content.appendChild(meta);
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "🗑️";
+        deleteBtn.onclick = () => deleteTask(task.id);
+
+        div.appendChild(checkbox);
+        div.appendChild(content);
+        div.appendChild(deleteBtn);
+        taskListEl.appendChild(div);
+      });
+    }
+
+    // ─── Neue Aufgabe anlegen (POST /tasks am Backend) ─
+    async function addTask() {
+      const title = newTitleInput.value.trim();
+      if (!title) return;
+
+      const dueTime = newTimeInput.value || "12:00";
+      const category = newCategorySelect.value;
+      const priority = newPrioritySelect.value;
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/tasks`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title, dueTime, category, priority }),
+        });
+
+        if (!response.ok) {
+          const data = await response.json();
+          showError(data.error || "Fehler beim Anlegen");
+          return;
+        }
+
+        newTitleInput.value = "";
+        newTimeInput.value = "";
+        newCategorySelect.value = "walk";
+        newPrioritySelect.value = "medium";
+        showError("");
+        refreshAll();
+      } catch (err) {
+        showError("Backend nicht erreichbar.");
+      }
+    }
+
+    // ─── Abhaken (PUT /tasks/:id am Backend) ─────────
+    async function toggleTask(id) {
+      try {
+        await fetch(`${BACKEND_URL}/tasks/${id}`, { method: "PUT" });
+        refreshAll();
+      } catch (err) {
+        showError("Backend nicht erreichbar.");
+      }
+    }
+
+    // ─── Löschen (DELETE /tasks/:id am Backend) ──────
+    async function deleteTask(id) {
+      try {
+        await fetch(`${BACKEND_URL}/tasks/${id}`, { method: "DELETE" });
+        refreshAll();
+      } catch (err) {
+        showError("Backend nicht erreichbar.");
+      }
+    }
+
+    newTitleInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") addTask();
+    });
+
+    refreshAll();
+  </script>
+
+</body>
+</html>
