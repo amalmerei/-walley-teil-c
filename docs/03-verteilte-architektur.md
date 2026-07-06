@@ -182,3 +182,42 @@ Teil C mit einfachem HTML/JavaScript neu umgesetzt – inhaltlich identisch,
 aber jetzt über HTTP mit dem eigenen Backend verbunden statt nur im
 Browser-Speicher zu arbeiten. Der originale Lovable-Code liegt zur Referenz
 in `docs/referenz-teil-b/` (siehe dort).
+
+---
+
+## Live-Test: Zusammenspiel der Services beim Abhaken
+
+Um zu zeigen, dass Frontend, Backend, Stats-Service und Notification-Service
+nicht nur einzeln laufen, sondern auch live zusammenarbeiten, wurde eine
+überfällige Aufgabe in der App abgehakt.
+
+**Vorher:** Aufgabe "Play fetch in the backyard" ist noch nicht erledigt.
+
+![Vor dem Abhaken](Screenshots/persistenz-vorher.png)
+
+**Nachher:** Nach dem Anklicken der Checkbox ist die Aufgabe durchgestrichen,
+der Fortschritt hat sich erhöht (Wert vom Stats-Service), und die Anzahl
+überfälliger Aufgaben in der roten Warnung ist gesunken (Wert vom
+Notification-Service).
+
+![Nach dem Abhaken](Screenshots/persistenz-nachher.png)
+
+## Test der Persistenz (dauerhafte Speicherung)
+
+Anders als bei Teil B (Lovable), wo alle Änderungen beim Neuladen der Seite
+verloren gingen, bleiben die Daten in Teil C dauerhaft erhalten, da sie in
+der SQLite-Datenbank gespeichert werden.
+
+Eine neue Aufgabe "Brush teeth" wurde mit Uhrzeit 20:00, Kategorie "Health"
+und Priorität "High" angelegt.
+
+![Neue Aufgabe hinzugefügt](Screenshots/neue-aufgabe-hinzugefuegt.png)
+
+Anschließend wurde die Seite manuell neu geladen (Cmd+R im Browser). Sowohl
+die neu angelegte Aufgabe "Brush teeth" als auch die zuvor abgehakte
+Aufgabe sind weiterhin unverändert vorhanden:
+
+![Zustand nach dem Neuladen](Screenshots/nach-neuladen.png)
+
+Dies belegt, dass die Änderungen tatsächlich in der Datenbank gespeichert
+wurden und nicht nur im flüchtigen Speicher des Browsers lagen.
