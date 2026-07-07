@@ -141,6 +141,52 @@ Nachweis über `curl http://localhost:4200/health` – zeigt, dass alle drei
 
 ---
 
+## Live-Test: Zusammenspiel der Services beim Abhaken
+
+Um zu zeigen, dass Frontend, Backend, Stats-Service und Notification-Service
+nicht nur einzeln laufen, sondern auch live zusammenarbeiten, wurde eine
+überfällige Aufgabe in der App abgehakt.
+
+**Vorher:** Aufgabe "Evening medication" ist noch nicht erledigt.
+
+![Vor dem Abhaken](Screenshots/persistenz-vorher.png)
+
+**Nachher:** Nach dem Anklicken der Checkbox ist die Aufgabe durchgestrichen,
+der Fortschritt hat sich erhöht (Wert vom Stats-Service), und die Anzahl
+überfälliger Aufgaben in der roten Warnung ist gesunken (Wert vom
+Notification-Service).
+
+![Nach dem Abhaken](Screenshots/persistenz-nachher.png)
+
+Das zeigt: Eine einzelne Nutzeraktion im Frontend löst automatisch neue
+Anfragen an **drei unterschiedliche, unabhängige Backend-Prozesse** aus
+(Backend selbst, Stats-Service, Notification-Service), deren Antworten
+sofort in der Oberfläche aktualisiert werden.
+
+---
+
+## Test der Persistenz (dauerhafte Speicherung)
+
+Anders als bei Teil B (Lovable), wo alle Änderungen beim Neuladen der Seite
+verloren gingen, bleiben die Daten in Teil C dauerhaft erhalten, da sie in
+der SQLite-Datenbank gespeichert werden.
+
+Eine neue Aufgabe "Brush teeth" wurde mit Uhrzeit 20:00, Kategorie "Health"
+und Priorität "High" angelegt.
+
+![Neue Aufgabe hinzugefügt](Screenshots/neue-aufgabe-hinzugefuegt.png)
+
+Anschließend wurde die Seite manuell neu geladen (Cmd+R im Browser). Sowohl
+die neu angelegte Aufgabe "Brush teeth" als auch die zuvor abgehakte
+Aufgabe sind weiterhin unverändert vorhanden:
+
+![Zustand nach dem Neuladen](Screenshots/nach-neuladen.png)
+
+Dies belegt, dass die Änderungen tatsächlich in der Datenbank gespeichert
+wurden und nicht nur im flüchtigen Speicher des Browsers lagen.
+
+---
+
 ## Zusammenfassung: Fünf unabhängige, gleichzeitig laufende Prozesse
 
 Die Screenshots oben belegen zusammen, dass alle fünf Module gleichzeitig
@@ -162,15 +208,8 @@ ein einzelnes Frontend-Backend-Bundle.
 
 ## Werkzeuge
 
-- **Cursor** (VS-Code-Klon mit KI-Unterstützung) als Hauptwerkzeug für die
-  gesamte Entwicklung
-- **Claude Code** (CLI) kurz zusätzlich installiert und benutzt, als
-  Nachweis für das zweite geforderte Tool (siehe `01-werkzeuge.md`)
-- Änderungen an bestehenden Dateien wurden teilweise direkt über das
-  Terminal (`sed`-Befehle) vorgenommen, da der Editor-Zugriff über die
-  Cursor-Oberfläche wiederholt zu technischen Problemen führte (siehe
-  `02-frontend-verbindung.md` für Details zu den aufgetretenen Fehlern und
-  deren Lösung)
+Details zu den verwendeten Werkzeugen (Cursor, Claude Code) und zur
+Arbeitsweise über das Terminal: siehe [`01-werkzeuge.md`](01-werkzeuge.md).
 
 ## Bezug zu Teil B
 
@@ -182,42 +221,3 @@ Teil C mit einfachem HTML/JavaScript neu umgesetzt – inhaltlich identisch,
 aber jetzt über HTTP mit dem eigenen Backend verbunden statt nur im
 Browser-Speicher zu arbeiten. Der originale Lovable-Code liegt zur Referenz
 in `docs/referenz-teil-b/` (siehe dort).
-
----
-
-## Live-Test: Zusammenspiel der Services beim Abhaken
-
-Um zu zeigen, dass Frontend, Backend, Stats-Service und Notification-Service
-nicht nur einzeln laufen, sondern auch live zusammenarbeiten, wurde eine
-überfällige Aufgabe in der App abgehakt.
-
-**Vorher:** Aufgabe "Evening medication" ist noch nicht erledigt.
-
-![Vor dem Abhaken](Screenshots/persistenz-vorher.png)
-
-**Nachher:** Nach dem Anklicken der Checkbox ist die Aufgabe durchgestrichen,
-der Fortschritt hat sich erhöht (Wert vom Stats-Service), und die Anzahl
-überfälliger Aufgaben in der roten Warnung ist gesunken (Wert vom
-Notification-Service).
-
-![Nach dem Abhaken](Screenshots/persistenz-nachher.png)
-
-## Test der Persistenz (dauerhafte Speicherung)
-
-Anders als bei Teil B (Lovable), wo alle Änderungen beim Neuladen der Seite
-verloren gingen, bleiben die Daten in Teil C dauerhaft erhalten, da sie in
-der SQLite-Datenbank gespeichert werden.
-
-Eine neue Aufgabe "Brush teeth" wurde mit Uhrzeit 20:00, Kategorie "Health"
-und Priorität "High" angelegt.
-
-![Neue Aufgabe hinzugefügt](Screenshots/neue-aufgabe-hinzugefuegt.png)
-
-Anschließend wurde die Seite manuell neu geladen (Cmd+R im Browser). Sowohl
-die neu angelegte Aufgabe "Brush teeth" als auch die zuvor abgehakte
-Aufgabe sind weiterhin unverändert vorhanden:
-
-![Zustand nach dem Neuladen](Screenshots/nach-neuladen.png)
-
-Dies belegt, dass die Änderungen tatsächlich in der Datenbank gespeichert
-wurden und nicht nur im flüchtigen Speicher des Browsers lagen.
