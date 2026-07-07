@@ -4,12 +4,17 @@ Amal Merei · Matrikel 107771 · Softwaretechnik (BHT MIB 20 S26)
 ### Hauptwerkzeug: Cursor
 Cursor ist ein VS-Code-Klon mit eingebauter KI-Unterstützung. Er wurde als
 Hauptwerkzeug für die gesamte Entwicklung von Teil C genutzt:
-- Anlegen des Projektordners walley-teil-c
-- Erste Erstellung und Bearbeitung von index.js (Backend)
-- Nutzung des integrierten Terminals für alle node- und npm-Befehle sowie
-  für spätere Änderungen am Code, da die Bearbeitung über die grafische
-  Editor-Oberfläche wiederholt zu Verwechslungen führte (z. B. falsche
-  Datei geöffnet, Verwechslung mit dem separaten "Cursor Agents"-Fenster)
+- Anlegen des Projektordners walley-teil-c in Cursor
+- Erste Erstellung von index.js (Backend) in der Cursor-Editor-Oberfläche
+
+Alle node- und npm-Befehle (Server starten, Pakete installieren) sowie
+spätere Änderungen am bestehenden Code wurden über das separate
+macOS-Terminal ausgeführt, nicht über die grafische Cursor-Oberfläche. Der
+Grund: Die Bearbeitung direkt in Cursor führte wiederholt zu
+Verwechslungen (z. B. versehentlich falsche Datei geöffnet, Verwechslung
+mit dem separaten "Cursor Agents"-Fenster für KI-Chats). Das Arbeiten
+direkt im Terminal mit gezielten Befehlen (z. B. sed für einzelne
+Textänderungen) erwies sich als zuverlässiger.
 Installation: Cursor wurde bereits vor Beginn von Teil C installiert
 (heruntergeladen von cursor.com).
 ![Cursor Installer](Screenshots/cursor-installer.png)
