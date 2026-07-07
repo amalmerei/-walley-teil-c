@@ -1,8 +1,5 @@
 # Teil C – Werkzeuge und Installation
 Amal Merei · Matrikel 107771 · Softwaretechnik (BHT MIB 20 S26)
-## Anforderung laut Aufgabenstellung
-Ein Hauptwerkzeug benutzen: entweder eine CLI oder ein VS-Code-Klon.
-Das andere Tool auch mal installieren und benutzen, als Beweis.
 ## Verwendete Werkzeuge
 ### Hauptwerkzeug: Cursor
 Cursor ist ein VS-Code-Klon mit eingebauter KI-Unterstützung. Er wurde als
@@ -29,8 +26,3 @@ wieder auszulesen:
 Anschließend wurde Claude Code auch für echte Projektarbeit genutzt, zum
 Beispiel zum Erstellen der package.json:
 ![Claude Code erstellt package.json](Screenshots/claude-code-package-json.png)
-## Fazit
-Damit ist die Anforderung erfüllt: Ein Werkzeug (Cursor) wurde durchgängig
-als Hauptwerkzeug für die gesamte Entwicklung genutzt, ein zweites
-Werkzeug (Claude Code CLI) wurde zusätzlich installiert und benutzt, um
-den Nachweis zu erbringen.
