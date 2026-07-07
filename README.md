@@ -12,7 +12,8 @@ verteilten System mit dauerhafter Datenspeicherung aus.
 
 Die vollständige Dokumentation zu Teil A (GUI-Entwurf mit Google Stitch)
 und Teil B (funktionierender Prototyp mit Lovable) liegt als PDF in
-`docs/teil-a-und-b/`.
+`docs/teil-a-und-b/`. Hinweis: Die Online-Vorschau von GitHub kann diese
+PDF nicht direkt anzeigen – bitte über den Download-Button herunterladen.
 
 ## Ziel des Projekts
 
