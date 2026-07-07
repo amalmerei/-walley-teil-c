@@ -5,8 +5,11 @@ Amal Merei · Matrikel 107771 · Softwaretechnik (BHT MIB 20 S26)
 Cursor ist ein VS-Code-Klon mit eingebauter KI-Unterstützung. Er wurde als
 Hauptwerkzeug für die gesamte Entwicklung von Teil C genutzt:
 - Anlegen des Projektordners walley-teil-c
-- Schreiben und Bearbeiten von index.js (Backend)
-- Nutzung des integrierten Terminals für alle node- und npm-Befehle
+- Erste Erstellung und Bearbeitung von index.js (Backend)
+- Nutzung des integrierten Terminals für alle node- und npm-Befehle sowie
+  für spätere Änderungen am Code, da die Bearbeitung über die grafische
+  Editor-Oberfläche wiederholt zu Verwechslungen führte (z. B. falsche
+  Datei geöffnet, Verwechslung mit dem separaten "Cursor Agents"-Fenster)
 Installation: Cursor wurde bereits vor Beginn von Teil C installiert
 (heruntergeladen von cursor.com).
 ![Cursor Installer](Screenshots/cursor-installer.png)
