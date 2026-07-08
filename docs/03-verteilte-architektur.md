@@ -221,3 +221,66 @@ Teil C mit einfachem HTML/JavaScript neu umgesetzt – inhaltlich identisch,
 aber jetzt über HTTP mit dem eigenen Backend verbunden statt nur im
 Browser-Speicher zu arbeiten. Der originale Lovable-Code liegt zur Referenz
 in `docs/referenz-teil-b/` (siehe dort).
+
+---
+
+## Was genau zwischen den Ports übertragen wird
+
+Um die Kommunikation zwischen den Prozessen konkret sichtbar zu machen,
+hier die tatsächlichen Anfragen und Antworten zwischen den Ports, jeweils
+live per curl getestet:
+
+### Frontend-Server (5050) → Backend (3000)
+
+Das Frontend (ausgeliefert von Port 5050) schickt eine HTTP-GET-Anfrage
+an Port 3000:
+Port 3000 antwortet mit der kompletten Aufgabenliste als JSON-Text:
+
+![Port 3000 – alle Aufgaben](Screenshots/port-3000-tasks.png)
+
+Das Frontend empfängt diesen Text und baut daraus die sichtbare
+Aufgabenliste im Browser auf.
+
+### Stats-Service (4000) → Backend (3000)
+
+Der Stats-Service schickt selbst eine Anfrage an Port 3000 (dieselbe
+Route wie oben, GET /tasks), erhält dieselbe JSON-Liste zurück, zählt
+darin die Aufgaben mit completed: true, und gibt nur das verdichtete
+Ergebnis zurück:
+
+![Port 4000 – Fortschritt](Screenshots/port-4000-stats.png)
+
+Port 4000 sendet also nicht die komplette Liste weiter, sondern nur eine
+berechnete Zusammenfassung – der Stats-Service verarbeitet die Daten, die
+er von Port 3000 bekommt, bevor er sie weitergibt.
+
+### Notification-Service (4100) → Backend (3000)
+
+Genauso fragt der Notification-Service bei Port 3000 die komplette
+Aufgabenliste ab, vergleicht das Feld dueTime jeder Aufgabe mit der
+aktuellen Uhrzeit, und gibt nur die überfälligen Aufgaben zurück:
+
+![Port 4100 – überfällige Aufgaben](Screenshots/port-4100-overdue.png)
+
+### Health-Service (4200) → Backend (3000), Stats-Service (4000), Notification-Service (4100)
+
+Der Health-Service schickt an alle drei anderen Ports jeweils eine
+einfache Anfrage und prüft nur, ob eine Antwort zurückkommt. Das Ergebnis
+fasst den Online-Status aller drei zusammen:
+
+![Port 4200 – Online-Status aller Services](Screenshots/port-4200-health.png)
+
+### Zusammengefasst
+
+| Von Port | An Port | Was wird geschickt | Was kommt zurück |
+|---|---|---|---|
+| 5050 (Frontend) | 3000 (Backend) | GET/POST/PUT/DELETE-Anfragen | komplette Aufgabenliste bzw. einzelne Aufgabe als JSON |
+| 4000 (Stats) | 3000 (Backend) | GET-Anfrage für alle Aufgaben | komplette Aufgabenliste als JSON |
+| 4100 (Notification) | 3000 (Backend) | GET-Anfrage für alle Aufgaben | komplette Aufgabenliste als JSON |
+| 4200 (Health) | 3000, 4000, 4100 | einfache GET-Anfragen | jeweils eine Antwort oder Zeitüberschreitung |
+
+Jeder Pfeil in dieser Tabelle ist eine eigenständige Netzwerkanfrage
+zwischen zwei unabhängigen Prozessen – keine dieser Kommunikationen
+passiert innerhalb eines einzelnen Programms, sondern immer über HTTP
+zwischen getrennt laufenden Servern. Die Screenshots oben zeigen jeweils
+den curl-Befehl und die tatsächliche, live erhaltene Antwort.
