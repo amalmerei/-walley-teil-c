@@ -1,6 +1,6 @@
 # Walley's Pet Task Tracker – Teil C
 
-**Amal Merei · Matrikel 107771 · Softwaretechnik (BHT MIB 20 S26)**
+**Amal Merei · Matrikel 107771**
 
 ## Projektbeschreibung
 
